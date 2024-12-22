@@ -7,67 +7,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Sphere</title>
+    <title>Flying Taco Cats</title>
     <style>
         body {
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            overflow: hidden; /* Prevent scrollbars */
+            background-color: #000; /* Black background */
         }
-        canvas {
-            display: block;
+        .flying-cat {
+            position: absolute;
+            width: 100px; /* Adjust the size of the cat */
+            animation: fly infinite linear;
+        }
+
+        @keyframes fly {
+            from {
+                transform: translate(-10%, 0); /* Start off-screen */
+            }
+            to {
+                transform: translate(110%, 100vh); /* End off-screen */
+            }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
 </head>
 <body>
+    <!-- Flying cats will be added dynamically -->
     <script>
-        // Scene, Camera, and Renderer
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        // Add flying cats dynamically
+        const createFlyingCat = () => {
+            const cat = document.createElement('img');
+            cat.src = 'images/taco-cat.png'; // Replace with your taco cat image
+            cat.classList.add('flying-cat');
 
-        // Add a Sphere
-        const geometry = new THREE.SphereGeometry(1, 32, 32);
-        const texture = new THREE.TextureLoader().load('texture.jpg'); // Replace with your texture URL
-        const material = new THREE.MeshBasicMaterial({ map: texture });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
+            // Randomize starting position and animation duration
+            const startX = Math.random() * window.innerWidth;
+            const animationDuration = Math.random() * 5 + 5; // 5-10 seconds
 
-        // Position the Camera
-        camera.position.z = 3;
+            cat.style.top = `${Math.random() * window.innerHeight}px`;
+            cat.style.left = `${startX}px`;
+            cat.style.animationDuration = `${animationDuration}s`;
 
-        // Add Controls for Dragging
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
+            document.body.appendChild(cat);
 
-        renderer.domElement.addEventListener('mousedown', function(event) {
-            isDragging = true;
-        });
+            // Remove cat after animation ends
+            setTimeout(() => cat.remove(), animationDuration * 1000);
+        };
 
-        renderer.domElement.addEventListener('mouseup', function(event) {
-            isDragging = false;
-        });
-
-        renderer.domElement.addEventListener('mousemove', function(event) {
-            if (isDragging) {
-                const deltaMove = {
-                    x: event.movementX || event.mozMovementX || event.webkitMovementX || 0,
-                    y: event.movementY || event.mozMovementY || event.webkitMovementY || 0,
-                };
-
-                sphere.rotation.y += deltaMove.x * 0.01;
-                sphere.rotation.x += deltaMove.y * 0.01;
-            }
-        });
-
-        // Animate the Sphere
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-        animate();
+        // Create flying cats every second
+        setInterval(createFlyingCat, 1000);
     </script>
 </body>
 </html>
