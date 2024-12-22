@@ -7,59 +7,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magic 8-Ball</title>
+    <title>3D Sphere</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
             margin: 0;
-            padding: 0;
-            background-color: #f0f8ff; /* Light blue background */
+            overflow: hidden;
         }
-        h1 {
-            color: #333;
-            margin-top: 50px;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 16px;
-            background-color: #007bff; /* Blue */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #0056b3; /* Darker blue */
-        }
-        #answer {
-            font-size: 20px;
-            margin-top: 30px;
-            color: #555;
+        canvas {
+            display: block;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
 </head>
 <body>
-    <h1>Ask the Magic 8-Ball!</h1>
-    <button onclick="askMagic8Ball()">Shake the Ball</button>
-    <p id="answer"></p>
-
     <script>
-        function askMagic8Ball() {
-            const responses = [
-                "Yes, definitely!",
-                "Ask again later.",
-                "No, not at all.",
-                "It is certain.",
-                "Cannot predict now.",
-                "Very doubtful.",
-                "Without a doubt!",
-                "You may rely on it."
-            ];
-            const randomIndex = Math.floor(Math.random() * responses.length);
-            document.getElementById('answer').innerText = responses[randomIndex];
+        // Scene, Camera, and Renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add a Sphere
+        const geometry = new THREE.SphereGeometry(1, 32, 32);
+        const texture = new THREE.TextureLoader().load('texture.jpg'); // Replace with your texture URL
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+
+        // Position the Camera
+        camera.position.z = 3;
+
+        // Add Controls for Dragging
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        renderer.domElement.addEventListener('mousedown', function(event) {
+            isDragging = true;
+        });
+
+        renderer.domElement.addEventListener('mouseup', function(event) {
+            isDragging = false;
+        });
+
+        renderer.domElement.addEventListener('mousemove', function(event) {
+            if (isDragging) {
+                const deltaMove = {
+                    x: event.movementX || event.mozMovementX || event.webkitMovementX || 0,
+                    y: event.movementY || event.mozMovementY || event.webkitMovementY || 0,
+                };
+
+                sphere.rotation.y += deltaMove.x * 0.01;
+                sphere.rotation.x += deltaMove.y * 0.01;
+            }
+        });
+
+        // Animate the Sphere
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
         }
+        animate();
     </script>
 </body>
 </html>
